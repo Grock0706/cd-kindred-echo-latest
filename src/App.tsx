@@ -152,6 +152,7 @@ export default function App(){
       <div role="tablist" aria-label="Views" style={{ maxWidth: 680, margin: '0 auto 1rem', display: 'flex', gap: '0.5rem' }}>
         <button role="tab" aria-selected={tab==='notes'} onClick={()=>setTab('notes')} style={tab==='notes'?activeTab:tabStyle}>Notes</button>
         <button role="tab" aria-selected={tab==='summary'} onClick={()=>setTab('summary')} style={tab==='summary'?activeTab:tabStyle}>Summary</button>
+        <button role="tab" aria-selected={tab==='about'} onClick={()=>setTab('about')} style={tab==='about'?activeTab:tabStyle}>About</button>
       </div>
 
       {tab==='notes' && (
@@ -247,6 +248,30 @@ export default function App(){
               ))}
             </ul>
           )}
+        </section>
+      )}
+
+      {tab==='about' && (
+        <section aria-labelledby="about" style={cardStyle}>
+          <h2 id="about" style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: 12 }}>Kindred Echo — Purpose & Vision</h2>
+          <div style={{ color: '#333', lineHeight: 1.6 }}>
+            <h3 style={{ marginTop: 0 }}>🌿 MISSION + VISION STATEMENTS</h3>
+            <h4 style={{ marginBottom: 8 }}>💫 Vision Statement</h4>
+            <p>
+              To create a compassionate digital space where reflection becomes connection — empowering every person, regardless of ability, to express, be heard, and belong.
+            </p>
+            <h4 style={{ marginTop: 12, marginBottom: 8 }}>🎯 Mission Statement</h4>
+            <p>
+              Kindred Echo bridges private self-reflection and collective empathy through accessible journaling, guided AI insights, and supportive community circles.
+              We champion inclusion, mindfulness, and emotional wellbeing by transforming personal stories into shared understanding.
+            </p>
+            <p>
+              By allowing users to share insights, connect through lived experiences, and echo support for one another, Kindred Echo aims to bridge isolation and build empathy through technology.
+            </p>
+            <p>
+              It’s not just a personal wellness app — it’s a growing digital community of reflection, compassion, and accessibility.
+            </p>
+          </div>
         </section>
       )}
     </main>
