@@ -1,4 +1,5 @@
 # Kindred Echo (MVP)
+ [![Live Demo](https://img.shields.io/badge/Live-Demo-blue?logo=github&style=flat-square)](https://grock0706.github.io/cd-kindred-echo-latest)
 React + Dexie + jsPDF starter with Summary export and voice input.
 
 ## Run
