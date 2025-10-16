@@ -5,7 +5,7 @@ import { jsPDF } from 'jspdf'
 
 const TAGS = ['symptom','task','appointment','other'] as const
 type Tag = typeof TAGS[number]
-type Tab = 'notes' | 'summary'
+type Tab = 'notes' | 'summary' | 'about'
 
 export default function App(){
   const [notes, setNotes] = useState<Note[]>([])
@@ -15,7 +15,9 @@ export default function App(){
   const [tab, setTab] = useState<Tab>('notes')
   const [fromDate, setFromDate] = useState<string>('')
   const [toDate, setToDate] = useState<string>('')
-  const recRef = useRef<SpeechRecognition | null>(null)
+  const [showBanner, setShowBanner] = useState(true)
+  // SpeechRecognition type may not be present in all TS DOM libs; use any to be safe
+  const recRef = useRef<any>(null)
 
   // Load notes on start
   useEffect(() => { void loadNotes() }, [])
@@ -116,9 +118,34 @@ export default function App(){
 
   return (
     <main className="min-h-screen" style={{ background: 'white', color: 'black', padding: '1rem' }}>
-      <header style={{ maxWidth: 680, margin: '0 auto 1rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Kindred Echo</h1>
-        <p className="sr-only">Accessibility companion app</p>
+      <header className="max-w-2xl mx-auto mb-4 text-center relative">
+        <h1 className="text-3xl font-bold mb-2">Kindred Echo</h1>
+
+        {showBanner && (
+          <div 
+            className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-sm text-gray-800 shadow-sm animate-fade-in relative"
+            role="region" 
+            aria-label="App purpose banner"
+          >
+            <p>
+              Kindred Echo helps you capture thoughts, track emotions, and reflect on your day — 
+              designed to support inclusion, accessibility, and mindful journaling.
+              <button 
+                onClick={() => setTab('about')} 
+                className="ml-2 text-blue-600 underline hover:text-blue-800"
+              >
+                Learn more →
+              </button>
+            </p>
+            <button
+              onClick={() => setShowBanner(false)}
+              aria-label="Dismiss banner"
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-lg"
+            >
+              ×
+            </button>
+          </div>
+        )}
       </header>
 
       {/* Tabs */}
