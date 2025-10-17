@@ -1,1 +1,2 @@
 node_modules/\ndist/\n.vscode/\n.DS_Store\n.env\n.env.local\n*.log\ncoverage/\n.idea/\n# build outputs\nbuild/\n
+node_modules
