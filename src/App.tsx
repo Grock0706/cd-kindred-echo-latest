@@ -88,6 +88,12 @@ export default function App(){
     setRecording(true); recRef.current.start()
   }
 
+  const toggleHighContrast = () => {
+    const updated = { ...prefs, highContrast: !prefs.highContrast }
+    setPrefs(updated)
+    try { localStorage.setItem('kindred:prefs', JSON.stringify(updated)) } catch {}
+  }
+
   const assist = async (note: Note) => {
     const checklist = generateChecklist(note.text)
     alert('Next steps:\n- ' + checklist.join('\n- '))
@@ -151,6 +157,16 @@ export default function App(){
         <main className="min-h-screen" style={{ background: prefs.highContrast ? 'black' : 'white', color: prefs.highContrast ? 'white' : 'black', padding: '1rem', fontSize: prefs.fontSize }}>
       <header className="max-w-2xl mx-auto mb-4 text-center relative">
         <h1 className="text-3xl font-bold mb-2">Kindred Echo</h1>
+
+        {/* Persistent toggle to switch high contrast mode on/off */}
+        <button
+          onClick={toggleHighContrast}
+          aria-pressed={prefs.highContrast}
+          aria-label={prefs.highContrast ? 'Disable high contrast' : 'Enable high contrast'}
+          style={{ position: 'absolute', right: 0, top: 0, padding: '6px 10px', borderRadius: 8, border: '1px solid #ccc', background: prefs.highContrast ? 'white' : 'black', color: prefs.highContrast ? 'black' : 'white', cursor: 'pointer' }}
+        >
+          {prefs.highContrast ? 'Normal contrast' : 'High contrast'}
+        </button>
 
         {showBanner && (
           <div 
