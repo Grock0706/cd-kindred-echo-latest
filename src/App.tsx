@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Onboarding from './components/Onboarding'
 import dayjs from 'dayjs'
 import { db, type Note } from './db'
 import { jsPDF } from 'jspdf'
@@ -16,6 +17,9 @@ export default function App(){
   const [fromDate, setFromDate] = useState<string>('')
   const [toDate, setToDate] = useState<string>('')
   const [showBanner, setShowBanner] = useState(true)
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try { return localStorage.getItem('kindred:onboard') !== 'done' } catch { return true }
+  })
   // SpeechRecognition type may not be present in all TS DOM libs; use any to be safe
   const recRef = useRef<any>(null)
 
@@ -117,7 +121,11 @@ export default function App(){
   }
 
   return (
-    <main className="min-h-screen" style={{ background: 'white', color: 'black', padding: '1rem' }}>
+    <>
+      {showOnboarding ? (
+        <Onboarding onStart={() => { setShowOnboarding(false); try{ localStorage.setItem('kindred:onboard','done') }catch{} }} />
+      ) : (
+        <main className="min-h-screen" style={{ background: 'white', color: 'black', padding: '1rem' }}>
       <header className="max-w-2xl mx-auto mb-4 text-center relative">
         <h1 className="text-3xl font-bold mb-2">Kindred Echo</h1>
 
@@ -274,7 +282,9 @@ export default function App(){
           </div>
         </section>
       )}
-    </main>
+        </main>
+      )}
+    </>
   )
 }
 
