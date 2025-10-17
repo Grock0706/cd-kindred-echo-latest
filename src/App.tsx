@@ -20,6 +20,13 @@ export default function App(){
   const [showOnboarding, setShowOnboarding] = useState(() => {
     try { return localStorage.getItem('kindred:onboard') !== 'done' } catch { return true }
   })
+  const [prefs, setPrefs] = useState(() => {
+    try {
+      const raw = localStorage.getItem('kindred:prefs')
+      return raw ? JSON.parse(raw) : { fontSize: 16, highContrast: false, tts: false }
+    } catch { return { fontSize: 16, highContrast: false, tts: false } }
+  })
+  const [onboardingVisible, setOnboardingVisible] = useState(true)
   // SpeechRecognition type may not be present in all TS DOM libs; use any to be safe
   const recRef = useRef<any>(null)
 
@@ -43,6 +50,15 @@ export default function App(){
     rec.onend = () => setRecording(false)
     recRef.current = rec
   }, [])
+
+  // simple TTS helper (stub)
+  const speak = (text: string) => {
+    if (!prefs.tts) return
+    const S = (window as any).speechSynthesis
+    if (!S) return
+    const ut = new SpeechSynthesisUtterance(text)
+    S.cancel(); S.speak(ut)
+  }
 
   const toggleTag = (tag: Tag) => {
     setSelTags(prev => prev.includes(tag) ? prev.filter(t=>t!==tag) : [...prev, tag])
@@ -123,9 +139,16 @@ export default function App(){
   return (
     <>
       {showOnboarding ? (
-        <Onboarding onStart={() => { setShowOnboarding(false); try{ localStorage.setItem('kindred:onboard','done') }catch{} }} />
+        onboardingVisible && (
+          <Onboarding initial={prefs} onStart={(p)=>{
+            setPrefs(p); try{ localStorage.setItem('kindred:prefs', JSON.stringify(p)); localStorage.setItem('kindred:onboard','done') }catch{}
+            // fade out then hide
+            setOnboardingVisible(false)
+            setTimeout(()=>{ setShowOnboarding(false) }, 300)
+          }} />
+        )
       ) : (
-        <main className="min-h-screen" style={{ background: 'white', color: 'black', padding: '1rem' }}>
+        <main className="min-h-screen" style={{ background: prefs.highContrast ? 'black' : 'white', color: prefs.highContrast ? 'white' : 'black', padding: '1rem', fontSize: prefs.fontSize }}>
       <header className="max-w-2xl mx-auto mb-4 text-center relative">
         <h1 className="text-3xl font-bold mb-2">Kindred Echo</h1>
 

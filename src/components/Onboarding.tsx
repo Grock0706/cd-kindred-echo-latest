@@ -1,15 +1,17 @@
 import { useState } from "react";
 
-export default function Onboarding({ onStart }: { onStart: () => void }) {
-  const [fontSize, setFontSize] = useState(16);
-  const [highContrast, setHighContrast] = useState(false);
-  const [tts, setTts] = useState(false);
+type Prefs = { fontSize: number; highContrast: boolean; tts: boolean }
+
+export default function Onboarding({ onStart, initial, visible=true }:{ onStart: (p: Prefs)=>void, initial?: Partial<Prefs>, visible?: boolean }) {
+  const [fontSize, setFontSize] = useState(initial?.fontSize ?? 16);
+  const [highContrast, setHighContrast] = useState(initial?.highContrast ?? false);
+  const [tts, setTts] = useState(initial?.tts ?? false);
 
   return (
     <main
       className={`min-h-screen flex flex-col items-center justify-center ${
         highContrast ? "bg-black text-white" : "bg-white text-black"
-      }`}
+      } ${visible? '' : 'animate-fade-out'}`}
       style={{ fontSize }}
     >
       <h1 className="text-3xl font-bold mb-4">Welcome to Kindred Echo</h1>
@@ -49,7 +51,7 @@ export default function Onboarding({ onStart }: { onStart: () => void }) {
       </div>
 
       <button
-        onClick={onStart}
+        onClick={() => onStart({ fontSize, highContrast, tts })}
         className="mt-6 px-6 py-3 bg-black text-white rounded-lg shadow hover:bg-gray-800"
       >
         Begin Your Journey →

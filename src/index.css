@@ -9,3 +9,13 @@
 .animate-fade-in {
 	animation: fade-in 0.4s ease-in-out;
 }
+
+/* Fade-out for onboarding */
+@keyframes fade-out {
+	from { opacity: 1; transform: translateY(0); }
+	to { opacity: 0; transform: translateY(-8px); }
+}
+
+.animate-fade-out {
+	animation: fade-out 0.28s ease-in-out forwards;
+}
