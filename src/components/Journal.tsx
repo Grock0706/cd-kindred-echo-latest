@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { db, type Note } from "../db";
 import type { Flow } from './Selection'
-import { jsPDF } from "jspdf";
 
 export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -31,7 +30,9 @@ export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
     void loadNotes();
   }
 
-  function exportPDF() {
+  async function exportPDF() {
+    // Dynamically import jsPDF so it's only loaded when the user requests export
+    const { jsPDF } = await import('jspdf')
     const doc = new jsPDF();
     notes.forEach((note, i) => {
       const tagLabel = note.tags && note.tags.length ? note.tags.join(', ') : 'general'
