@@ -4,6 +4,7 @@ import Onboarding from './components/Onboarding';
 import type { Flow } from './components/Selection';
 const FeelingPage = lazy(() => import('./components/FeelingPage'));
 import Journal from './components/Journal';
+import Circles from './components/Circles';
 
 export default function App() {
   // App flow: onboard (welcome) → select (Echo/Circles) → journal (if Echo) → circles (placeholder)
@@ -34,15 +35,9 @@ export default function App() {
     return <Journal flow={flow ?? undefined} />;
   }
 
-  // Show Circles placeholder if Circles selected
+  // Show Circles component if Circles selected
   if (stage === 'circles') {
-    return (
-      <main className="device-center">
-        <div className="device journal-card" style={{ minHeight: 400, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <h2>Circles — Coming Soon!</h2>
-        </div>
-      </main>
-    );
+    return <Circles onBack={() => setStage('select')} />
   }
 
   return null;
