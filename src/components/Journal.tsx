@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { db, type Note } from "../db";
 import type { Flow } from './Selection'
+import React from 'react'
 
 export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -42,6 +43,38 @@ export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
     doc.save("KindredEcho_Notes.pdf");
   }
 
+  // Echo AI reflection
+  const [loadingEcho, setLoadingEcho] = useState(false)
+  const [echoResult, setEchoResult] = useState<string | null>(null)
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
+
+  async function reflectWithEcho(note: Note) {
+    setSelectedNote(note)
+    setLoadingEcho(true)
+    setEchoResult(null)
+    try {
+      const r = await fetch('/api/echo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: note.text })
+      })
+      const j = await r.json()
+      if (j?.reflection) setEchoResult(j.reflection)
+      else setEchoResult(j?.error || 'No reflection returned')
+    } catch (e: any) {
+      setEchoResult(`Error: ${e?.message || String(e)}`)
+    } finally {
+      setLoadingEcho(false)
+    }
+  }
+
+  function saveEchoAsNote() {
+    if (!echoResult) return
+    void db.notes.add({ id: crypto.randomUUID(), text: `Echo reflection: ${echoResult}`, tags: ['echo'], createdAt: new Date().toISOString() })
+    setEchoResult(null)
+    void loadNotes()
+  }
+
   return (
     <div className="device-center">
       <div className="device">
@@ -73,12 +106,32 @@ export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
         <ul style={{ marginTop: 18, listStyle: 'none', padding: 0 }}>
           {notes.map((n) => (
             <li key={n.id} style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#6b7280' }}>{dayjs(n.createdAt).format('MMM D, HH:mm')}</div>
+              <div style={{ fontSize: 12, color: '#6b7280', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{dayjs(n.createdAt).format('MMM D, HH:mm')}</span>
+                <button onClick={() => reflectWithEcho(n)} style={{ fontSize: 12, background: 'transparent', border: 'none', color: '#7d93f6', cursor: 'pointer' }}>
+                  Reflect with Echo
+                </button>
+              </div>
               <div style={{ background: 'white', borderRadius: 12, padding: 12, boxShadow: '0 4px 10px rgba(16,24,40,0.04)', marginTop: 6 }}>{n.text}</div>
               {n.tags && n.tags.length > 0 && <div style={{ marginTop: 6 }}><span className="tag-pill">#{n.tags[0]}</span></div>}
             </li>
           ))}
         </ul>
+        
+        {/* Echo modal */}
+        {selectedNote && (
+          <div style={{ position: 'fixed', left: 0, right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: 'rgba(0,0,0,0.35)', position: 'absolute', inset: 0 }} onClick={() => { setSelectedNote(null); setEchoResult(null) }} />
+            <div style={{ zIndex: 50, background: 'white', padding: 18, borderRadius: 12, maxWidth: 560, width: '94%', boxShadow: '0 12px 40px rgba(16,24,40,0.12)' }}>
+              <h3 style={{ marginTop: 0 }}>Echo's Reflection</h3>
+              <div style={{ minHeight: 60 }}>{loadingEcho ? <div>Thinking…</div> : <div style={{ whiteSpace: 'pre-wrap' }}>{echoResult}</div>}</div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
+                <button onClick={() => { setSelectedNote(null); setEchoResult(null) }} className="secondary">Close</button>
+                <button onClick={saveEchoAsNote} className="cta" disabled={!echoResult}>Save Reflection</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
