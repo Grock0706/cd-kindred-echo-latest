@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import Onboarding from './components/Onboarding';
-import Selection, { type Flow } from './components/Selection';
+import type { Flow } from './components/Selection';
+const FeelingPage = lazy(() => import('./components/FeelingPage'));
 import Journal from './components/Journal';
 
 export default function App() {
@@ -14,18 +15,19 @@ export default function App() {
     return <Onboarding onStart={() => setStage('select')} />;
   }
 
-  // Show selection screen (Echo/Circles)
+  // Show selection screen (Echo/Circles) — replaced by FeelingPage
   if (stage === 'select') {
-    return <Selection onChoose={choice => {
-      if (choice === 'echo') {
-        setFlow('echo');
-        setStage('journal');
-      } else {
-        setFlow('circles');
-        setStage('circles');
-      }
-    }} />;
+    return (
+      <Suspense fallback={<div className="device-center"><div className="device journal-card">Loading…</div></div>}>
+        <FeelingPage onSelect={(choice) => {
+          if (choice === 'echo') { setStage('journal'); setFlow('echo') }
+          else { setStage('circles'); setFlow('circles') }
+        }} />
+      </Suspense>
+    )
   }
+
+  /* 'feeling' stage removed — FeelingPage is shown for 'select' */
 
   // Show journal if Echo selected
   if (stage === 'journal') {

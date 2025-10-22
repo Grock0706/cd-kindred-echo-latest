@@ -21,3 +21,23 @@ body{ background: var(--bg); color:var(--text); font-family: Inter, system-ui, -
 .input{ width:100%; border:1px solid #e6e7ea; border-radius:12px; padding:.75rem }
 .muted{ color:var(--muted) }
 .tag-pill{ display:inline-block; padding:.25rem .5rem; border-radius:999px; background:#f3f4f6; font-size:.8rem }
+
+/* focus utility used by interactive tiles */
+.focus-ring:focus { outline: none; box-shadow: 0 0 0 6px rgba(59,130,246,0.12); border-radius: 12px }
+
+/* FeelingPage styles */
+.feeling-root{ min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); padding:2.5rem }
+.feeling-card{ background:var(--card); padding:2.25rem; border-radius:28px; max-width:420px; width:100%; box-shadow:0 12px 30px rgba(16,24,40,0.08); text-align:center }
+.feeling-title{ font-size:1.6rem; color:#25416a; margin:0 0 0.5rem; font-weight:700 }
+.feeling-sub{ color:var(--muted); margin:0 0 1rem }
+.feeling-list{ display:flex; flex-direction:column; gap:14px; margin-top:12px }
+.feeling-tile{ display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:16px; box-shadow:0 6px 18px rgba(16,24,40,0.06); border:none; cursor:pointer; transition:transform .12s, background .12s }
+.feeling-tile:active{ transform:scale(.995) }
+.feeling-icon{ width:52px; height:52px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#274a6d; color:white }
+.feeling-svg{ width:22px; height:22px; color: #fff }
+.feeling-label{ font-size:1.05rem; font-weight:600; color:#25416a }
+.feeling-echo{ background:#fbdad3 }
+.feeling-echo .feeling-icon{ background:#274a6d }
+.feeling-circles{ background:#dde7fa }
+.feeling-circles .feeling-icon{ background:#274a6d }
+
