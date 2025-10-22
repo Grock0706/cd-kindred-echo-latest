@@ -53,7 +53,9 @@ export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
     setLoadingEcho(true)
     setEchoResult(null)
     try {
-      const r = await fetch('/api/echo', {
+      const apiBase = (import.meta as any).env?.VITE_API_BASE || ''
+      const url = apiBase ? `${apiBase.replace(/\/$/, '')}/api/echo` : '/api/echo'
+      const r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: note.text })
