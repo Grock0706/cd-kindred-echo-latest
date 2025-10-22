@@ -29,20 +29,29 @@ export default function Circles({ onBack }: { onBack: () => void }) {
           </p>
 
           <div className="flex gap-3 mt-4">
-            <button
+            <motion.button
               onClick={onBack}
               className="cta"
               aria-label="Back to how are you feeling"
+              initial={{ y: 6, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
               Back to Feeling Page
-            </button>
-            <button
-              onClick={() => alert('We\'re not quite ready — stay tuned!')}
+            </motion.button>
+
+            <motion.button
+              onClick={() => alert("We're not quite ready — stay tuned!")}
               className="secondary"
               aria-label="Learn more"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.18 }}
             >
               Learn More
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
