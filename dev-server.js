@@ -7,18 +7,39 @@ import path from 'path'
 const app = express()
 app.use(bodyParser.json())
 
-// Reuse the logic in api/echo.ts by importing it dynamically
-const echoPath = path.resolve('./api/echo.ts')
+// Reuse the logic in api/echo by importing compiled JS first, then TS, with clear logging.
 let handler = null
-try {
-  handler = (await import(`file://${echoPath}`)).default
-} catch (e) {
+const tryImportHandler = async () => {
+  const candidates = ['./api/echo.js', './api/echo.ts']
+  for (const rel of candidates) {
+    const p = path.resolve(rel)
+    if (fs.existsSync(p)) {
+      try {
+        const mod = await import(`file://${p}`)
+        if (mod && mod.default) {
+          console.log(`Loaded echo handler from ${rel}`)
+          return mod.default
+        }
+      } catch (err) {
+        console.error(`Failed to import ${rel}:`, err && err.stack ? err.stack : String(err))
+      }
+    }
+  }
+
   // fallback - simple inline handler
-  handler = async function (req, res) {
+  console.log('Using fallback mock echo handler')
+  return async function (req, res) {
     const { text } = req.body || {}
     if (!text) return res.status(400).json({ error: 'Missing text' })
-    return res.json({ reflection: `Mock echo: I hear you — "${text.slice(0, 80)}..."` })
+    return res.json({ reflection: `Mock echo: I hear you — "${String(text).slice(0, 80)}..."` })
   }
+}
+
+try {
+  handler = await tryImportHandler()
+} catch (err) {
+  console.error('Unexpected error while loading echo handler:', err)
+  handler = await tryImportHandler()
 }
 
 app.post('/api/echo', async (req, res) => {
@@ -41,4 +62,11 @@ app.post('/api/echo', async (req, res) => {
 })
 
 const port = process.env.DEV_SERVER_PORT || 3001
+process.on('uncaughtException', (err) => {
+  console.error('uncaughtException', err && err.stack ? err.stack : err)
+})
+process.on('unhandledRejection', (reason) => {
+  console.error('unhandledRejection', reason)
+})
+
 app.listen(port, () => console.log(`Dev API server running at http://localhost:${port}`))

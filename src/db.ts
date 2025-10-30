@@ -1,24 +1,21 @@
-import Dexie from 'dexie'
+import Dexie, { Table } from 'dexie';
 
-export type Note = {
-  id: string
-  text: string
-  tags?: string[]
-  createdAt: string
+export interface Reflection {
+  id?: number;
+  date: string;
+  text: string;
+  echo: string;
 }
 
-export const db = new Dexie('kindred_echo_db') as Dexie & { notes: Dexie.Table<Note, string> }
+export class ReflectionsDatabase extends Dexie {
+  reflections!: Table<Reflection, number>;
 
-db.version(1).stores({
-  notes: 'id, createdAt'
-})
-
-// Provide a small helper to seed (optional)
-export async function seedDemo(){
-  const count = await db.notes.count()
-  if(count === 0){
-    await db.notes.add({ id: crypto.randomUUID(), text: 'Welcome to Kindred Echo — your first reflection', tags: ['intro'], createdAt: new Date().toISOString() })
+  constructor() {
+    super('ReflectionsDatabase');
+    this.version(1).stores({
+      reflections: '++id,date,text,echo',
+    });
   }
 }
 
-export default db
+export const reflectionsDB = new ReflectionsDatabase();

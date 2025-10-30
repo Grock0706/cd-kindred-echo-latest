@@ -1,10 +1,10 @@
-
 import React, { useState, lazy, Suspense } from 'react';
 import Onboarding from './components/Onboarding';
 import type { Flow } from './components/Selection';
 const FeelingPage = lazy(() => import('./components/FeelingPage'));
 import Journal from './components/Journal';
 import Circles from './components/Circles';
+import DailyReflections from './components/DailyReflections'; // ✅ remove .tsx
 
 export default function App() {
   // App flow: onboard (welcome) → select (Echo/Circles) → journal (if Echo) → circles (placeholder)
@@ -30,10 +30,11 @@ export default function App() {
 
   /* 'feeling' stage removed — FeelingPage is shown for 'select' */
 
-  // Show journal if Echo selected
-  if (stage === 'journal') {
-    return <Journal flow={flow ?? undefined} />;
-  }
+// Show journal if Echo selected
+if (stage === 'journal') {
+  return <DailyReflections />;
+}
+
 
   // Show Circles component if Circles selected
   if (stage === 'circles') {

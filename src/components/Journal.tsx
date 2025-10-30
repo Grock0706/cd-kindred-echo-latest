@@ -49,24 +49,42 @@ export default function Journal({ flow }: { flow?: Flow }): JSX.Element {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
 
   async function reflectWithEcho(note: Note) {
-    setSelectedNote(note)
-    setLoadingEcho(true)
-    setEchoResult(null)
+    setSelectedNote(note);
+    setLoadingEcho(true);
+    setEchoResult(null);
+
     try {
-      const apiBase = (import.meta as any).env?.VITE_API_BASE || ''
-      const url = apiBase ? `${apiBase.replace(/\/$/, '')}/api/echo` : '/api/echo'
-      const r = await fetch(url, {
+      // ✅ Explicitly set your production API base (Vercel)
+      const API_BASE =
+        import.meta.env.VITE_API_BASE ||
+        'https://kindred-echo-latest-7ydzv6zag-gerry-perezs-projects.vercel.app';
+
+      const url = `${API_BASE}/api/echo`;
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: note.text })
-      })
-      const j = await r.json()
-      if (j?.reflection) setEchoResult(j.reflection)
-      else setEchoResult(j?.error || 'No reflection returned')
+        body: JSON.stringify({ text: note.text }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
+      }
+
+      // Parse JSON safely
+      const result = await response.json();
+
+      if (result?.reflection) {
+        setEchoResult(result.reflection);
+      } else if (result?.error) {
+        setEchoResult(`Error: ${result.error}`);
+      } else {
+        setEchoResult('No reflection returned.');
+      }
     } catch (e: any) {
-      setEchoResult(`Error: ${e?.message || String(e)}`)
+      setEchoResult(`Error: ${e?.message || String(e)}`);
     } finally {
-      setLoadingEcho(false)
+      setLoadingEcho(false);
     }
   }
 
